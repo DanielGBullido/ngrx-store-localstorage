@@ -22,7 +22,7 @@ const validateStateKeys = (keys: any[]) => {
     if (typeof attr !== 'string') {
       throw new TypeError(
         `localStorageSync Unknown Parameter Type: ` +
-          `Expected type of string, got ${typeof attr}`
+        `Expected type of string, got ${typeof attr}`
       );
     }
     return key;
@@ -67,7 +67,7 @@ export const rehydrateApplicationState = (
         } else {
           console.error(
             `Either encrypt or decrypt is not a function on '${
-              curr[key]
+            curr[key]
             }' key object.`
           );
         }
@@ -75,7 +75,7 @@ export const rehydrateApplicationState = (
         // Let know that one of the encryption functions is not provided
         console.error(
           `Either encrypt or decrypt function is not present on '${
-            curr[key]
+          curr[key]
           }' key object.`
         );
       }
@@ -83,6 +83,7 @@ export const rehydrateApplicationState = (
 
     let stateSlice = storage.getItem(storageKeySerializer(key));
     if (stateSlice) {
+      stateSlice = atob(stateSlice);
       // Use provided decrypt function
       if (decrypt) {
         stateSlice = decrypt(stateSlice);
@@ -148,7 +149,7 @@ export const syncStateUpdate = (
             // If one of those is not present, then let know that one is missing
             console.error(
               `Either encrypt or decrypt function is not present on '${
-                key[name]
+              key[name]
               }' key object.`
             );
           }
@@ -178,8 +179,8 @@ export const syncStateUpdate = (
         storage.setItem(
           storageKeySerializer(key),
           typeof stateSlice === 'string'
-            ? stateSlice
-            : JSON.stringify(stateSlice, replacer, space)
+            ? btoa(stateSlice)
+            : btoa(JSON.stringify(stateSlice, replacer, space))
         );
       } catch (e) {
         console.warn('Unable to save state to localStorage:', e);
@@ -215,11 +216,11 @@ export const localStorageSync = (config: LocalStorageConfig) => (
   const stateKeys = validateStateKeys(config.keys);
   const rehydratedState = config.rehydrate
     ? rehydrateApplicationState(
-        stateKeys,
-        config.storage,
-        config.storageKeySerializer,
-        config.restoreDates
-      )
+      stateKeys,
+      config.storage,
+      config.storageKeySerializer,
+      config.restoreDates
+    )
     : undefined;
 
   return function(state = rehydratedState, action: any) {
