@@ -64,7 +64,12 @@ exports.rehydrateApplicationState = function (keys, storage, storageKeySerialize
         }
         var stateSlice = storage.getItem(storageKeySerializer(key));
         if (stateSlice) {
-            stateSlice = atob(stateSlice);
+            try {
+                stateSlice = atob(stateSlice);
+            }
+            catch (e) {
+                stateSlice;
+            }
             // Use provided decrypt function
             if (decrypt) {
                 stateSlice = decrypt(stateSlice);
